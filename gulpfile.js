@@ -3,7 +3,7 @@ var mainBowerFiles = require('main-bower-files'),
     flatten = require('gulp-flatten'),
     gulpFilter = require('gulp-filter'),
     uglify = require('gulp-uglify'),
-    minifycss = require('gulp-minify-css'),
+    cleanCSS = require('gulp-clean-css'),
     rename = require('gulp-rename'),
     path = require('path'),
     del = require('del'),
@@ -85,6 +85,10 @@ gulp.task( 'extract-css', function(){
     return gulp.src(mainBowerFiles(),{ base: 'bower_components' })
         .pipe( cssFilter )
         .pipe( less( { paths:  [path.join( 'bower_components', 'bootstrap', 'less')] } ) )
+        .pipe( cleanCSS() )
+        .pipe( rename( {
+            suffix: ".min"
+        } ))
         .pipe(gulp.dest(temp_path ))
         .pipe( cssFilter.restore );
 
