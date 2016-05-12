@@ -6,86 +6,110 @@ var mainBowerFiles = require('main-bower-files'),
     minifycss = require('gulp-minify-css'),
     rename = require('gulp-rename'),
     path = require('path'),
-    folders = require('gulp-folders'),
-    dir = require('node-dir'),
-    del = require('del');
+    del = require('del'),
+    fs = require('fs'),
+    less = require('gulp-less');
 
 // Define paths variables
 var temp_path = 'tmp',
     dest_path =  'www',
-    js_dest_path = dest_path + '/js';
+    js_dest_path = dest_path + '/js',
+    font_dest_path = dest_path + '/fonts',
+    css_dest_path = dest_path + '/css';
 
-gulp.task( 'default', [ 'clean' ]);
+var fileList = function( dir, filelist ) {
 
-gulp.task( 'clean', [ 'publish' ], function() {
+    var files = fs.readdirSync( dir) ;
 
-    return del( [ temp_path + '/**' ] );
+    filelist = filelist || [];
 
-});
+    files.forEach( function( file ) {
 
-gulp.task( 'publish', [ 'extract-from-components' ], function() {
+        if ( fs.statSync( dir + '/' + file ).isDirectory() ) {
 
-    dir.subdirs( temp_path, function (err, subdirs) {
+            filelist = fileList( dir + '/' + file + '/', filelist);
 
-        if (err) throw err;
-        for( var i = 0, len = subdirs.length; i < len; i++ ){
+        } else {
 
-            gulp.src( subdirs[i] + "/*.js" )
-                //.pipe( gulpFilter( '*.js' ) )
-                .pipe( gulp.dest( js_dest_path ) );
+            filelist.push( ( dir + file ).replace( /\/\//g,'/') );
 
         }
 
     });
 
+    return filelist;
+};
+
+gulp.task( 'default', [ 'clean' ]);
+
+gulp.task( 'clean', [ 'publish' ], function(){
+
+    del( [ temp_path + '/**' ] );
+
 });
 
-// grab libraries files from bower_components, minify and push in /public
-gulp.task( 'extract-from-components', function() {
-    var jsFilter = gulpFilter( '**/*.js', { restore: true } ),
-        cssFilter = gulpFilter( '**/*.css', { restore: true } ),
-        fontFilter = gulpFilter( [ '**/*.eot', '**/*.woff*', '**/*.svg', '**/*.ttf' ], { restore: true } );
+gulp.task( 'publish', [ 'extract-js', 'extract-fonts', 'extract-css' ], function() {
+
+
+    var files = fileList( temp_path );
+
+
+    for( var i = 0, len = files.length; i < len; i++ ) {
+
+        if( files[i].match( /\.min\.js$/ ) ){
+
+            gulp.src( files[i] )
+                .pipe( gulp.dest( js_dest_path ) );
+
+        } else if( files[i].match( /\/fonts\// ) ){
+
+            gulp.src( files[i] )
+                .pipe( gulp.dest( font_dest_path ) );
+
+        } else if( files[i].match( /\.css$/ ) ){
+
+            gulp.src( files[i] )
+                .pipe( gulp.dest( css_dest_path ) );
+
+        }
+
+
+    }
+
+});
+
+gulp.task( 'extract-css', function(){
+
+    var cssFilter = gulpFilter( '**/*.less', { restore: true } );
 
     return gulp.src(mainBowerFiles(),{ base: 'bower_components' })
-        //.pipe( gulp.dest( dest_path + '/js/' ) )
+        .pipe( cssFilter )
+        .pipe( less( { paths:  [path.join( 'bower_components', 'bootstrap', 'less')] } ) )
+        .pipe(gulp.dest(temp_path ))
+        .pipe( cssFilter.restore );
 
-        // grab vendor js files from bower_components, minify and push in /public
+});
+
+gulp.task( 'extract-fonts', function() {
+
+    var fontFilter = gulpFilter(['*.eot', '*.woff*', '*.svg', '*.ttf'], {restore: true});
+
+    return gulp.src('bower_components/bootstrap/fonts/*')
+        .pipe( gulp.dest( temp_path+'/fonts' ) );
+
+});
+
+
+gulp.task( 'extract-js', function() {
+
+    var jsFilter = gulpFilter( '**/*.js', { restore: true } );
+
+    return gulp.src(mainBowerFiles(),{ base: 'bower_components' })
         .pipe( jsFilter )
-        //.pipe(gulp.dest(dest_path + '/js/'))
         .pipe( uglify() )
         .pipe( rename( {
             suffix: ".min"
         } ))
         .pipe( gulp.dest( temp_path ) )
         .pipe( jsFilter.restore );
-        /*.pipe( fontFilter )
-        .pipe( flatten() )
-        .pipe( gulp.dest( temp_path ) );*/
-
-    /*
-     folders(pathToFolder, function(folder){
-     //This will loop over all folders inside pathToFolder main, secondary
-     //Return stream so gulp-folders can concatenate all of them
-     //so you still can use safely use gulp multitasking
-
-     return gulp.src(path.join(pathToFolder, folder, '*.js'))
-     .pipe(concat(folder + '.js'))
-     .pipe(gulp.dest('dist'));
-     })
-     */
-
-        // grab vendor css files from bower_components, minify and push in /public
-        //.pipe(cssFilter)
-        //.pipe(gulp.dest(dest_path + '/css'))
-       // .pipe(minifycss())
-      //  .pipe(rename({
-       //     suffix: ".min"
-        //}))
-       // .pipe(gulp.dest(dest_path + '/css'))
-        //.pipe(cssFilter.restore)
-
-        // grab vendor font files from bower_components and push in /public
-        /*.pipe(fontFilter)
-        .pipe(flatten())
-        .pipe(gulp.dest(dest_path + '/fonts'));*/
 });
