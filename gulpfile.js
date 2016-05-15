@@ -1,6 +1,4 @@
-var mainBowerFiles = require('main-bower-files'),
-    gulp = require('gulp'),
-    flatten = require('gulp-flatten'),
+var gulp = require('gulp'),
     gulpFilter = require('gulp-filter'),
     uglify = require('gulp-uglify'),
     cleanCSS = require('gulp-clean-css'),
@@ -8,14 +6,16 @@ var mainBowerFiles = require('main-bower-files'),
     path = require('path'),
     del = require('del'),
     fs = require('fs'),
-    less = require('gulp-less');
+    less = require('gulp-less'),
+    watch = require('gulp-watch');
 
 // Define paths variables
 var temp_path = 'tmp',
     dest_path =  'www',
     js_dest_path = dest_path + '/js',
     font_dest_path = dest_path + '/fonts',
-    css_dest_path = dest_path + '/css';
+    css_dest_path = dest_path + '/css',
+    jsFilter = gulpFilter( '**/*.js', { restore: true } );
 
 var fileList = function( dir, filelist ) {
 
@@ -40,6 +40,41 @@ var fileList = function( dir, filelist ) {
     return filelist;
 };
 
+var getBowerMainFiles = function( dir ){
+
+    var dir = dir || 'bower_components',
+        files = fileList( dir ),
+        bowerMainFiles = [];
+
+    for( var i = 0, len = files.length; i < len; i++ ) {
+
+        if( files[i].match( /\/bower\.json$/ ) ){
+
+            var json = JSON.parse(fs.readFileSync(files[i]));
+
+            if( typeof json.main === 'string' ){
+
+                //console.log('====Files===', json.main, files[i].replace(/bower\.json/,json.main), fs.readFileSync( files[i].replace(/bower\.json/,json.main) ));
+                bowerMainFiles[ bowerMainFiles.length ] = files[i].replace(/bower\.json/,json.main);
+
+            } else if( typeof json.main.length != 'undefined'){
+
+                for( var item in json.main ){
+
+                    bowerMainFiles[ bowerMainFiles.length ] = files[i].replace(/bower\.json/,json.main[ item ]);
+
+                }
+
+            }
+
+        }
+
+    }
+
+    return bowerMainFiles;
+
+}
+
 gulp.task( 'default', [ 'clean' ]);
 
 gulp.task( 'clean', [ 'publish' ], function(){
@@ -48,7 +83,7 @@ gulp.task( 'clean', [ 'publish' ], function(){
 
 });
 
-gulp.task( 'publish', [ 'extract-js', 'extract-fonts', 'extract-css' ], function() {
+gulp.task( 'publish', [ 'extract-js', 'extract-fonts', 'extract-css', 'buildFromSrc' ], function() {
 
 
     var files = fileList( temp_path );
@@ -82,14 +117,14 @@ gulp.task( 'extract-css', function(){
 
     var cssFilter = gulpFilter( '**/*.less', { restore: true } );
 
-    return gulp.src(mainBowerFiles(),{ base: 'bower_components' })
+    return gulp.src( getBowerMainFiles() ) //mainBowerFiles(),{ base: 'bower_components' })
         .pipe( cssFilter )
         .pipe( less( { paths:  [path.join( 'bower_components', 'bootstrap', 'less')] } ) )
         .pipe( cleanCSS() )
         .pipe( rename( {
             suffix: ".min"
         } ))
-        .pipe(gulp.dest(temp_path ))
+        .pipe(gulp.dest(temp_path + '/css' ))
         .pipe( cssFilter.restore );
 
 });
@@ -106,14 +141,46 @@ gulp.task( 'extract-fonts', function() {
 
 gulp.task( 'extract-js', function() {
 
-    var jsFilter = gulpFilter( '**/*.js', { restore: true } );
+    //var jsFilter = gulpFilter( '**/*.js', { restore: true } );
 
-    return gulp.src(mainBowerFiles(),{ base: 'bower_components' })
+    return gulp.src( getBowerMainFiles() )
         .pipe( jsFilter )
         .pipe( uglify() )
         .pipe( rename( {
             suffix: ".min"
         } ))
-        .pipe( gulp.dest( temp_path ) )
+        .pipe( gulp.dest( temp_path + '/js' ) )
         .pipe( jsFilter.restore );
+});
+
+gulp.task( 'buildFromSrc', function(){
+
+        gulp.src( 'src/**' )
+        .pipe( gulpFilter( 'src/css/**' ) )
+        .pipe( gulp.dest( 'www' ) );
+
+        gulp.src( 'src/**' )
+        .pipe( gulpFilter( 'src/html/**' ) )
+        .pipe( gulp.dest( 'www' ) );
+
+        return gulp.src( 'src/**' )
+        .pipe( gulpFilter( 'src/js/*.js', { restore: true } ) )
+        .pipe( uglify() )
+        .pipe( rename( {
+            suffix: ".min"
+        } ))
+        .pipe( gulp.dest( 'www' ) )
+        //.pipe( jsFilter.restore );
+
+});
+
+gulp.task( 'watch', function(){
+
+    return gulp.src( 'src/**' )
+        .pipe( watch( 'src/**', function(){
+
+            gulp.start( 'buildFromSrc' );
+
+        } ) );
+
 });

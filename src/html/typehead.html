@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel='stylesheet prefetch' href='//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css'>
+</head>
+<body>
+<div ng-app="angularTypeahead">
+    <div class="container-fluid" ng-controller="TypeaheadCtrl">
+        <div class="form-group">
+            <label for="states">Search for US States</label>
+            <input name="states" id="states" type="text" placeholder="enter a state" ng-model="selected" typeahead="state for state in states | filter:$viewValue | limitTo:8" class="form-control">
+        </div>
+        <button class="btn btn-success" type="submit">Submit</button>
+    </div>
+</div>
+<!--<script src='//ajax.googleapis.com/ajax/libs/angularjs/1.3.2/angular.min.js'></script>-->
+<script src="../js/angular.min.js"></script>
+<!--<script src='//angular-ui.github.io/bootstrap/ui-bootstrap-tpls-0.12.0.js'></script>-->
+<script src="../js/ui-bootstrap-tpls.min.js"></script>
+<script>var myApp = angular.module('angularTypeahead', ['ui.bootstrap']);
+myApp.factory('States', function () {
+    var states = [
+        'Alabama',
+        'Alaska',
+        'Arizona',
+        'Arkansas',
+        'California',
+        'Colorado',
+        'Connecticut',
+        'Delaware',
+        'Florida',
+        'Georgia',
+        'Hawaii',
+        'Idaho',
+        'Illinois',
+        'Indiana',
+        'Iowa',
+        'Kansas',
+        'Kentucky',
+        'Louisiana',
+        'Maine',
+        'Maryland',
+        'Massachusetts',
+        'Michigan',
+        'Minnesota',
+        'Mississippi',
+        'Missouri',
+        'Montana',
+        'Nebraska',
+        'Nevada',
+        'New Hampshire',
+        'New Jersey',
+        'New Mexico',
+        'New York',
+        'North Dakota',
+        'North Carolina',
+        'Ohio',
+        'Oklahoma',
+        'Oregon',
+        'Pennsylvania',
+        'Rhode Island',
+        'South Carolina',
+        'South Dakota',
+        'Tennessee',
+        'Texas',
+        'Utah',
+        'Vermont',
+        'Virginia',
+        'Washington',
+        'West Virginia',
+        'Wisconsin',
+        'Wyoming'
+    ];
+    return states;
+});
+myApp.controller('TypeaheadCtrl', function ($scope, States) {
+    $scope.selected = undefined;
+    $scope.states = States;
+});
+//# sourceURL=pen.js
+</script>
+</body>
+</html>

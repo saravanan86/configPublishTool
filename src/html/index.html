@@ -9,10 +9,10 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Bare - Start Bootstrap Template</title>
+    <title>App Configuration Tool</title>
 
     <!-- Bootstrap Core CSS -->
-    <link href="www/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
 
     <!-- Custom CSS -->
     <style>
@@ -31,7 +31,7 @@
 
 </head>
 
-<body>
+<body ng-app="configToolApp">
 
     <!-- Navigation -->
     <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
@@ -44,26 +44,35 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="#">Start Bootstrap</a>
+                <a class="navbar-brand" href="#">Home</a>
             </div>
             <!-- Collect the nav links, forms, and other content for toggling -->
-            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1" ng-controller="searchController">
                 <ul class="nav navbar-nav">
                     <li>
-                        <a href="#">About</a>
+                        <a href="#">Add</a>
                     </li>
                     <li>
-                        <a href="#">Services</a>
+                        <a href="#">Edit</a>
                     </li>
                     <li>
-                        <a href="#">Contact</a>
+                        <a href="#">History</a>
                     </li>
                 </ul>
+                <form class="navbar-form navbar-right" role="search">
+                    <div class="form-group">
+                        <!--<input type="text" ng-model="selected" uib-typeahead="state for state in sites | filter:$viewValue | limitTo:8" class="form-control">-->
+                        <input type="text" class="form-control" placeholder="Search" ng-model="selected"
+                               id="sites" name="sites" uib-typeahead="site for site in sites | filter:$viewValue | limitTo:8">
+                    </div>
+                    <button type="submit" class="btn btn-default">Submit</button>
+                </form>
             </div>
             <!-- /.navbar-collapse -->
         </div>
         <!-- /.container -->
     </nav>
+
 
     <!-- Page Content -->
     <div class="container">
@@ -81,16 +90,21 @@
         <!-- /.row -->
 
     </div>
-    <!-- /.container -->
+      <!-- /.container -->
 
     <!-- jQuery Version 1.11.1 -->
-    <script src="www/js/jquery.min.js"></script>
-
-    <!-- Bootstrap Core JavaScript -->
-    <script src="www/js/bootstrap.min.js"></script>
+   <script src="../js/jquery.min.js"></script>
 
     <!-- Angular Core JavaScript -->
-    <script src="www/js/angular.min.js"></script>
+    <script src="../js/angular.min.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="../js/bootstrap.min.js"></script>
+
+
+    <script src="../js/ui-bootstrap-tpls.min.js"></script>
+
+    <script src="../js/controller.min.js"></script>
 
 </body>
 
