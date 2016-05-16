@@ -1,0 +1,15 @@
+ConfigTool Cheat Sheet:
+========================
+
+1) Starting Node HTTP server command:
+	http-server
+2) Installing Node dependencies:
+	npm install
+3) Publishing dependency files to "www" folder:
+	gulp 
+4) Watching development folder to push changes to "www" folder:
+	gulp watch
+5) Setting Mongo DB folder location:
+	mongod --dbpath c:\sara\data\db
+6) Start Monogo DB server:
+	mongo.exe

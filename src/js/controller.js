@@ -1,4 +1,4 @@
-var configToolApp = angular.module( 'configToolApp', [ 'ui.bootstrap' ] );
+var configToolApp = angular.module( 'configToolApp', [ 'ui.bootstrap', 'ngRoute' ] );
 
 configToolApp.factory( 'Sites', function(){
 
@@ -7,10 +7,31 @@ configToolApp.factory( 'Sites', function(){
     return sites;
 });
 
-configToolApp.controller( 'searchController',  [ "$scope", "Sites", function( $scope, Sites ){
+configToolApp.controller( 'searchController',  [ '$scope', 'Sites', function( $scope, Sites ){
 
     //console.log('=======',Sites);
     $scope.siteSearch = undefined;
     $scope.sites = Sites;
+
+    $scope.selectAppId = function( $item, $model, $label, $event ){
+
+        //console.log('=======$item, $model, $label=====', $item, $model, $label);
+        location.href = '#view/'+$item;
+
+    };
+
+}]);
+
+configToolApp.controller( 'viewController', [ '$scope', '$routeParams', function ( $scope, $routeParams ) {
+    //console.log('=========AppId===', $routeParams.appId);
+    $scope.appId = $routeParams.appId;
+
+}]);
+
+configToolApp.config( [ '$routeProvider', function( $routeProvider ){
+
+    $routeProvider.
+        when( '/view/:appId',{ templateUrl: 'view.html', controller: 'viewController' } )
+        .otherwise( { template: '<h1>App configuration tool.</h1><p class="lead">Use this tool to create or update App configs.</p>' } );
 
 }]);
