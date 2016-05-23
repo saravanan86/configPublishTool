@@ -13,3 +13,7 @@ ConfigTool Cheat Sheet:
 	mongod --dbpath c:\sara\data\db
 6) Start Monogo DB server:
 	mongo.exe
+7) MonogJS documentation URL:
+    https://github.com/mafintosh/mongojs
+8) MongoDB shell command quick ref:
+    https://docs.mongodb.com/manual/reference/mongo-shell/

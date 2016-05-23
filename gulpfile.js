@@ -7,7 +7,8 @@ var gulp = require('gulp'),
     del = require('del'),
     fs = require('fs'),
     less = require('gulp-less'),
-    watch = require('gulp-watch');
+    watch = require('gulp-watch'),
+    sass = require('gulp-sass');
 
 // Define paths variables
 var temp_path = 'tmp',
@@ -83,7 +84,7 @@ gulp.task( 'clean', [ 'publish' ], function(){
 
 });
 
-gulp.task( 'publish', [ 'extract-js', 'extract-fonts', 'extract-css', 'buildFromSrc' ], function() {
+gulp.task( 'publish', [ 'extract-js', 'extract-scss', 'extract-css', 'buildFromSrc' ], function() { //'extract-fonts', 'extract-css',
 
 
     var files = fileList( temp_path );
@@ -113,13 +114,33 @@ gulp.task( 'publish', [ 'extract-js', 'extract-fonts', 'extract-css', 'buildFrom
 
 });
 
-gulp.task( 'extract-css', function(){
+gulp.task( 'extract-scss', function(){
 
-    var cssFilter = gulpFilter( '**/*.less', { restore: true } );
+    var cssFilter = gulpFilter( '**/*.scss', { restore: true } );
+
+    /*
+     return gulp.src('./sass/** /*.scss')
+        .pipe(sass().on('error', sass.logError))
+        .pipe(gulp.dest('./css'));
+     */
 
     return gulp.src( getBowerMainFiles() ) //mainBowerFiles(),{ base: 'bower_components' })
         .pipe( cssFilter )
-        .pipe( less( { paths:  [path.join( 'bower_components', 'bootstrap', 'less')] } ) )
+        .pipe(sass().on('error', sass.logError))
+        .pipe( rename( {
+            suffix: ".min"
+        } ))
+        .pipe(gulp.dest(temp_path + '/css' ))
+        .pipe( cssFilter.restore );
+
+});
+
+gulp.task( 'extract-css', function(){
+
+    var cssFilter = gulpFilter( '**/*.css', { restore: true } );
+
+    return gulp.src( getBowerMainFiles() ) //mainBowerFiles(),{ base: 'bower_components' })
+        .pipe( cssFilter )
         .pipe( cleanCSS() )
         .pipe( rename( {
             suffix: ".min"

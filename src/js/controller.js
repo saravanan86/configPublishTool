@@ -1,4 +1,11 @@
-var configToolApp = angular.module( 'configToolApp', [ 'ui.bootstrap', 'ngRoute' ] );
+var configToolApp = angular.module( 'configToolApp', [ 'ui.bootstrap', 'ngRoute', 'xeditable' ] );
+
+
+configToolApp.run([ 'editableOptions', function( editableOptions ) {
+
+    editableOptions.theme = 'default'; // bootstrap3 theme. Can be also 'bs2', 'default'
+
+}]);
 
 configToolApp.factory( 'Sites', function(){
 
@@ -22,9 +29,30 @@ configToolApp.controller( 'searchController',  [ '$scope', 'Sites', function( $s
 
 }]);
 
-configToolApp.controller( 'viewController', [ '$scope', '$routeParams', function ( $scope, $routeParams ) {
+configToolApp.controller( 'viewController', [ '$scope', '$routeParams', '$http', function ( $scope, $routeParams, $http ) {
     //console.log('=========AppId===', $routeParams.appId);
     $scope.appId = $routeParams.appId;
+    var dataTypes = [];
+
+    $http.get( "http://localhost:8880/getMetadataTypes" ).then( function( response ){
+        console.log('===================', response.data);
+        //$scope.responseData = response.data;
+        var dbData = response.data;
+        for( var i = 0, len = dbData.length; i < len; i++ ){
+
+            dataTypes[ dataTypes.length ] = {
+
+                dataType: dbData[ i ].dataType,
+                valueType: dbData[ i ].dataDefaultValue+"",
+                defaultValue: dbData[ i ].valueType
+
+            };
+
+        }
+
+    });
+
+    $scope.metadataTypes = dataTypes;
 
 }]);
 

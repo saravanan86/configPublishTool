@@ -1,1 +1,28 @@
-<div>{{appId}}</div>
+<div class="card">
+    <!--<h3 class="card-header">{{appId}}</h3>-->
+    <h3 class="card-header">Metadata Types</h3>
+    <div class="card-block">
+        <div class="table-responsive">
+
+            <table class="table table-striped">
+                <thead class="thead-inverse">
+                <tr>
+                    <th>S.No</th>
+                    <th>MetadaData</th>
+                    <th>Value Type</th>
+                    <th>Default Value</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="data in metadataTypes">
+                    <th scope="row">{{$index + 1}}</th>
+                    <td editable-text="data.dataType" style="color: black;border-bottom: 0px;">{{data.dataType}}</td>
+                    <td editable-text="data.valueType" style="color: black;border-bottom: 0px;">{{data.valueType}}</td>
+                    <td editable-text="data.defaultValue" style="color: black;border-bottom: 0px;">{{data.defaultValue+""}}</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<!--<div>{{responseData}}</div>-->
